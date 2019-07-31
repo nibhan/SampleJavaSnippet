@@ -1,6 +1,6 @@
 
-
-public void updateTestCaseStatusToALM(String testCaseName,String result) throws Exception {
+// Method to update ALM status as per the test execution
+public void updateTestCaseStatusToALM(String testCaseName,String result) throws FlexException {
 		boolean testCaseUpdate = false;
 		int tc_id;
 		SimpleDateFormat dateFormat_date = null;
@@ -10,6 +10,8 @@ public void updateTestCaseStatusToALM(String testCaseName,String result) throws 
 		arrTestStatus.clear();
 		
 		HashMap<String, String> mALMTestRunIDStatus = new HashMap<String, String>();
+		
+		try {
 		
 		if(this.connection == null) {
 			throw new Exception("Error: No ALM Connection is open. Please call openConnection() method to open an ALM connection");
@@ -30,21 +32,13 @@ public void updateTestCaseStatusToALM(String testCaseName,String result) throws 
 					
 					for(Com4jObject testInstanceObj : testInstances) {
 						ITSTest testInstance = testInstanceObj.queryInterface(ITSTest.class);
-						tc_id=Integer.parseInt(testInstance.testId().toString());			//Ved Modified for status updatein ALM based on test ID						
+						tc_id=Integer.parseInt(testInstance.testId().toString());							
 			     		if (tc_id==DriverScript.iTC_ID)
 						//if(testCaseName.equalsIgnoreCase(testInstance.name())) {			     					
 						{
 					
-							try {
-								dateFormat_date = new SimpleDateFormat("MM/dd/yyyy");
-								dateFormat_time = new SimpleDateFormat("hh:mm:ss a");
-								//dateFormat = new SimpleDateFormat("MM/dd/YYYY");
-							//	dateFormat1 = new SimpleDateFormat("hh:mm:ss a");
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							
+							dateFormat_date = new SimpleDateFormat("MM/dd/yyyy");
+							dateFormat_time = new SimpleDateFormat("hh:mm:ss a");
 							Date date = new Date();
 							Calendar cal = Calendar.getInstance();
 							System.out.println("  Test Instance: %s"+testInstance.name());
@@ -151,14 +145,13 @@ public void updateTestCaseStatusToALM(String testCaseName,String result) throws 
 			}
 			
 		}
-		
-		if(!testCaseUpdate) {
-			DriverScript.log.info("							");
-			DriverScript.log.info("							");
-			System.out.println("WARNING: ALMUtility could not update result into ALM for "+"test case \"" + testCaseName + "\" under TEST SET \"" + testSetName + "\"");
-			DriverScript.log.info("WARNING: ALMUtility could not update result into ALM for "+"test case \"" + testCaseName + "\" under TEST SET \"" + testSetName + "\"");
-			DriverScript.log.info("							");
-			DriverScript.log.info("							");
+		} catch (Exception e)
+		{
+			if(!testCaseUpdate) {
+				DriverScript.log.info("WARNING: ALMUtility could not update result into ALM for "+"test case \"" + testCaseName + "\" under TEST SET \"" + testSetName + "\"");
+			}
+			throw new FlexException(e);
 		}
+		
 		
 	}
